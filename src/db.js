@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { Low } from 'lowdb';
-import { JSONFile, Memory } from 'lowdb/node';
+import { Low, Memory } from 'lowdb';
+import { JSONFile } from 'lowdb/node';
 
 const DEFAULT_DB_FILENAME = 'cointracker.json';
 const DEFAULT_DATA = { items: [], nextId: 1 };
