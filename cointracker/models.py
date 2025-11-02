@@ -1,14 +1,12 @@
 from __future__ import annotations
 
-from enum import Enum
-
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text, func
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
 
 
-class AcquisitionStatus(str, Enum):
+class AcquisitionStatus(str):
     OWNED = "owned"
     SOLD = "sold"
     WISHLIST = "wishlist"

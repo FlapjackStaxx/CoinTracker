@@ -13,8 +13,7 @@ app that scans and catalogs a foreign coin and banknote collection. See
 
 ## Getting Started
 
-1. Ensure you are using Python 3.10 or newer and install dependencies (ideally in a
-   fresh virtual environment so the latest dependency pins are applied):
+1. Install dependencies (ideally in a virtual environment):
 
    ```bash
    pip install -r requirements.txt
