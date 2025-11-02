@@ -14,12 +14,12 @@ class CurrencyBase(BaseModel):
     denomination: str = Field(..., max_length=100)
     year: Optional[int] = Field(None, ge=0, le=2100)
     catalog_reference: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
+    description: Optional[str]
     estimated_value: Optional[float] = Field(None, ge=0)
     market_value: Optional[float] = Field(None, ge=0)
-    status: AcquisitionStatus = Field(default=AcquisitionStatus.OWNED)
-    notes: Optional[str] = None
-    image_path: Optional[str] = None
+    status: str = Field(default=AcquisitionStatus.OWNED)
+    notes: Optional[str]
+    image_path: Optional[str]
 
 
 class CurrencyCreate(CurrencyBase):
@@ -32,12 +32,12 @@ class CurrencyUpdate(BaseModel):
     denomination: Optional[str] = Field(None, max_length=100)
     year: Optional[int] = Field(None, ge=0, le=2100)
     catalog_reference: Optional[str] = Field(None, max_length=100)
-    description: Optional[str] = None
+    description: Optional[str]
     estimated_value: Optional[float] = Field(None, ge=0)
     market_value: Optional[float] = Field(None, ge=0)
-    status: Optional[AcquisitionStatus] = None
-    notes: Optional[str] = None
-    image_path: Optional[str] = None
+    status: Optional[str]
+    notes: Optional[str]
+    image_path: Optional[str]
 
 
 class Currency(CurrencyBase):
@@ -50,9 +50,9 @@ class Currency(CurrencyBase):
 
 
 class RecognitionResult(BaseModel):
-    probable_match: Optional[str] = None
+    probable_match: Optional[str]
     confidence: float = Field(..., ge=0, le=1)
-    notes: Optional[str] = None
+    notes: Optional[str]
 
 
 class RecognitionRequest(BaseModel):
