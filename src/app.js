@@ -5,6 +5,12 @@ import { recognizeCurrency } from './services/recognition.js';
 
 const VALID_STATUSES = new Set(['owned', 'sold', 'wishlist']);
 
+function asyncHandler(handler) {
+  return (req, res, next) => {
+    Promise.resolve(handler(req, res, next)).catch(next);
+  };
+}
+
 function buildValidationError(errors) {
   return { errors };
 }
@@ -156,81 +162,99 @@ export function createApp(db) {
     res.json({ status: 'ok' });
   });
 
-  app.get('/items', (_req, res) => {
-    const items = itemsRepository.listItems();
-    res.json(items);
-  });
+  app.get(
+    '/items',
+    asyncHandler(async (_req, res) => {
+      const items = await itemsRepository.listItems();
+      res.json(items);
+    })
+  );
 
-  app.post('/items', (req, res) => {
-    const { data, errors } = parseCreatePayload(req.body ?? {});
-    if (errors.length > 0) {
-      return res.status(422).json(buildValidationError(errors));
-    }
-    const created = itemsRepository.createItem(data);
-    res.status(201).json(created);
-  });
+  app.post(
+    '/items',
+    asyncHandler(async (req, res) => {
+      const { data, errors } = parseCreatePayload(req.body ?? {});
+      if (errors.length > 0) {
+        return res.status(422).json(buildValidationError(errors));
+      }
+      const created = await itemsRepository.createItem(data);
+      res.status(201).json(created);
+    })
+  );
 
-  app.get('/items/:id', (req, res) => {
-    const id = Number.parseInt(req.params.id, 10);
-    const item = itemsRepository.getItem(id);
-    if (!item) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    res.json(item);
-  });
+  app.get(
+    '/items/:id',
+    asyncHandler(async (req, res) => {
+      const id = Number.parseInt(req.params.id, 10);
+      const item = await itemsRepository.getItem(id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+      res.json(item);
+    })
+  );
 
-  app.patch('/items/:id', (req, res) => {
-    const id = Number.parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid item id' });
-    }
+  app.patch(
+    '/items/:id',
+    asyncHandler(async (req, res) => {
+      const id = Number.parseInt(req.params.id, 10);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid item id' });
+      }
 
-    const { updates, errors } = parseUpdatePayload(req.body ?? {});
-    if (errors.length > 0) {
-      return res.status(422).json(buildValidationError(errors));
-    }
+      const { updates, errors } = parseUpdatePayload(req.body ?? {});
+      if (errors.length > 0) {
+        return res.status(422).json(buildValidationError(errors));
+      }
 
-    const updated = itemsRepository.updateItem(id, updates);
-    if (!updated) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    res.json(updated);
-  });
+      const updated = await itemsRepository.updateItem(id, updates);
+      if (!updated) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+      res.json(updated);
+    })
+  );
 
-  app.delete('/items/:id', (req, res) => {
-    const id = Number.parseInt(req.params.id, 10);
-    if (Number.isNaN(id)) {
-      return res.status(400).json({ error: 'Invalid item id' });
-    }
+  app.delete(
+    '/items/:id',
+    asyncHandler(async (req, res) => {
+      const id = Number.parseInt(req.params.id, 10);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid item id' });
+      }
 
-    const deleted = itemsRepository.deleteItem(id);
-    if (!deleted) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
-    res.status(204).send();
-  });
+      const deleted = await itemsRepository.deleteItem(id);
+      if (!deleted) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
+      res.status(204).send();
+    })
+  );
 
-  app.get('/items/:id/export', (req, res) => {
-    const id = Number.parseInt(req.params.id, 10);
-    const item = itemsRepository.getItem(id);
-    if (!item) {
-      return res.status(404).json({ error: 'Item not found' });
-    }
+  app.get(
+    '/items/:id/export',
+    asyncHandler(async (req, res) => {
+      const id = Number.parseInt(req.params.id, 10);
+      const item = await itemsRepository.getItem(id);
+      if (!item) {
+        return res.status(404).json({ error: 'Item not found' });
+      }
 
-    const exportPayload = {
-      name: item.name,
-      country: item.country,
-      denomination: item.denomination,
-      year: item.year,
-      description: item.description,
-      estimated_value: item.estimated_value,
-      market_value: item.market_value,
-      status: item.status,
-      notes: item.notes
-    };
+      const exportPayload = {
+        name: item.name,
+        country: item.country,
+        denomination: item.denomination,
+        year: item.year,
+        description: item.description,
+        estimated_value: item.estimated_value,
+        market_value: item.market_value,
+        status: item.status,
+        notes: item.notes
+      };
 
-    res.json(exportPayload);
-  });
+      res.json(exportPayload);
+    })
+  );
 
   app.post('/recognize', (req, res) => {
     const body = req.body ?? {};

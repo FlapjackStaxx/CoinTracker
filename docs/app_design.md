@@ -72,7 +72,7 @@
 
 ## Prototype Backend Implementation
 - A lightweight Node.js + Express service (included in this repository) provides CRUD endpoints for managing collection items, an export route, and a placeholder recognition endpoint for camera uploads.
-- SQLite serves as the persistence layer for the prototype, enabling rapid iteration without cloud dependencies.
+- Persistence relies on lowdb (JSON on disk) so the demo runs anywhere without compiling native SQLite bindings.
 - Automated Vitest + Supertest suites cover the health check, CRUD lifecycle, and recognition placeholder to ensure the demo API remains stable as features evolve.
 
 ## Security and Privacy Considerations
@@ -94,4 +94,3 @@
 - Percentage of catalog with complete metadata (target: 90%).
 - Recognition match accuracy (goal: >85% top-1 for trained regions).
 - Monthly active users and retention for pilot group.
-

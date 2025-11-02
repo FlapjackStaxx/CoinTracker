@@ -1,5 +1,6 @@
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { Memory } from 'lowdb/node';
 import { createApp } from '../src/app.js';
 import { createDatabase } from '../src/db.js';
 
@@ -7,17 +8,19 @@ describe('CoinTracker API (Node.js)', () => {
   let db;
   let app;
 
-  beforeAll(() => {
-    db = createDatabase(':memory:');
+  beforeAll(async () => {
+    db = await createDatabase({ adapter: new Memory() });
     app = createApp(db);
   });
 
-  beforeEach(() => {
-    db.exec('DELETE FROM currency_items;');
+  beforeEach(async () => {
+    db.data.items = [];
+    db.data.nextId = 1;
+    await db.write();
   });
 
-  afterAll(() => {
-    db.close();
+  afterAll(async () => {
+    await db.write();
   });
 
   it('responds to the health check', async () => {

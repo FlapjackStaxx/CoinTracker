@@ -1,8 +1,10 @@
-import Database from 'better-sqlite3';
 import fs from 'node:fs';
 import path from 'node:path';
+import { Low } from 'lowdb';
+import { JSONFile, Memory } from 'lowdb/node';
 
-const DEFAULT_DB_FILENAME = 'cointracker.db';
+const DEFAULT_DB_FILENAME = 'cointracker.json';
+const DEFAULT_DATA = { items: [], nextId: 1 };
 
 function resolvePath(dbPath) {
   if (!dbPath || dbPath === ':memory:') {
@@ -14,33 +16,52 @@ function resolvePath(dbPath) {
   return path.join(process.cwd(), dbPath);
 }
 
-export function createDatabase(dbPath = process.env.COINTRACKER_DB_PATH || DEFAULT_DB_FILENAME) {
-  const resolved = resolvePath(dbPath);
-  if (resolved !== ':memory:') {
-    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+function cloneDefaultData() {
+  return JSON.parse(JSON.stringify(DEFAULT_DATA));
+}
+
+export async function createDatabase(options = {}) {
+  const normalized =
+    typeof options === 'string'
+      ? { dbPath: options }
+      : options;
+
+  const {
+    dbPath = process.env.COINTRACKER_DB_PATH || DEFAULT_DB_FILENAME,
+    adapter
+  } = normalized;
+
+  if (adapter) {
+    const db = new Low(adapter, cloneDefaultData());
+    await db.read();
+    db.data ||= cloneDefaultData();
+    if (!Array.isArray(db.data.items)) {
+      db.data.items = [];
+    }
+    if (typeof db.data.nextId !== 'number') {
+      db.data.nextId = 1;
+    }
+    return db;
   }
 
-  const db = new Database(resolved);
-  db.pragma('foreign_keys = ON');
+  const resolved = resolvePath(dbPath);
+  let dbAdapter;
+  if (resolved === ':memory:') {
+    dbAdapter = new Memory();
+  } else {
+    fs.mkdirSync(path.dirname(resolved), { recursive: true });
+    dbAdapter = new JSONFile(resolved);
+  }
 
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS currency_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      country TEXT NOT NULL,
-      denomination TEXT NOT NULL,
-      year INTEGER,
-      catalog_reference TEXT,
-      description TEXT,
-      estimated_value REAL,
-      market_value REAL,
-      status TEXT NOT NULL DEFAULT 'owned',
-      notes TEXT,
-      image_path TEXT,
-      created_at TEXT NOT NULL,
-      updated_at TEXT NOT NULL
-    );
-  `);
-
+  const db = new Low(dbAdapter, cloneDefaultData());
+  await db.read();
+  db.data ||= cloneDefaultData();
+  if (!Array.isArray(db.data.items)) {
+    db.data.items = [];
+  }
+  if (typeof db.data.nextId !== 'number') {
+    db.data.nextId = 1;
+  }
+  await db.write();
   return db;
 }

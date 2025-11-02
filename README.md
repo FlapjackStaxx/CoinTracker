@@ -8,7 +8,7 @@ vision, while this repository provides a working REST API you can run locally.
 ## Features
 
 - ✅ Express REST API with CRUD, export, and recognition endpoints for your collection.
-- ✅ SQLite persistence managed via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3).
+- ✅ JSON persistence powered by [lowdb](https://github.com/typicode/lowdb) so the project runs without native build tools.
 - ✅ Deterministic recognition stub so you can prototype camera-driven workflows.
 - ✅ Vitest + Supertest coverage that exercises the health check, CRUD lifecycle, and
   recognition placeholder.
@@ -46,7 +46,7 @@ vision, while this repository provides a working REST API you can run locally.
    - `GET /items/{id}/export` – fetch a shareable summary payload.
    - `POST /recognize` – prototype vision endpoint that returns deterministic sample data.
 
-   Records are stored in `cointracker.db` in the repository root. Delete the file at any time to
+   Records are stored in `cointracker.json` in the repository root. Delete the file at any time to
    start fresh.
 
 ### Windows quickstart
@@ -65,5 +65,5 @@ Use `Ctrl+C` to stop the server.
 npm test
 ```
 
-Vitest spins up the Express app against an in-memory SQLite database so the suite runs quickly
+Vitest spins up the Express app against an in-memory lowdb adapter so the suite runs quickly
 without touching your real data file.
