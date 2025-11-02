@@ -71,9 +71,9 @@
 - Valuation confidence derived from recency + source reliability weights.
 
 ## Prototype Backend Implementation
-- A lightweight FastAPI service (included in this repository) provides CRUD endpoints for managing collection items, an export route, and a placeholder recognition endpoint for camera uploads.
+- A lightweight Node.js + Express service (included in this repository) provides CRUD endpoints for managing collection items, an export route, and a placeholder recognition endpoint for camera uploads.
 - SQLite serves as the persistence layer for the prototype, enabling rapid iteration without cloud dependencies.
-- Automated tests cover the health check, CRUD lifecycle, and recognition placeholder to ensure the demo API remains stable as features evolve.
+- Automated Vitest + Supertest suites cover the health check, CRUD lifecycle, and recognition placeholder to ensure the demo API remains stable as features evolve.
 
 ## Security and Privacy Considerations
 - Supabase Auth with email/password and optional biometric sign-in.

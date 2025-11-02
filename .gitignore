@@ -1,4 +1,6 @@
-__pycache__/
-*.py[cod]
+node_modules/
+*.sqlite
 *.db
 .env
+coverage/
+.DS_Store

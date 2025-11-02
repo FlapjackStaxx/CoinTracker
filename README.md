@@ -1,34 +1,69 @@
 # CoinTracker
 
-CoinTracker combines a working FastAPI backend with a detailed product design for a mobile
-app that scans and catalogs a foreign coin and banknote collection. See
-[`docs/app_design.md`](docs/app_design.md) for the conceptual plan.
+CoinTracker now ships with a lightweight Node.js + Express backend that powers the prototype
+for scanning and cataloging a foreign coin and banknote collection. The
+[`docs/app_design.md`](docs/app_design.md) document still captures the long-term product
+vision, while this repository provides a working REST API you can run locally.
 
 ## Features
 
-- ✅ REST API for CRUD management of collection items (create, read, update, delete, export).
-- ✅ Prototype recognition endpoint that returns deterministic placeholder suggestions for images.
-- ✅ SQLite persistence with SQLAlchemy and Pydantic validation.
-- ✅ Automated test coverage for health check, CRUD flow, and recognition placeholder.
+- ✅ Express REST API with CRUD, export, and recognition endpoints for your collection.
+- ✅ SQLite persistence managed via [`better-sqlite3`](https://github.com/WiseLibs/better-sqlite3).
+- ✅ Deterministic recognition stub so you can prototype camera-driven workflows.
+- ✅ Vitest + Supertest coverage that exercises the health check, CRUD lifecycle, and
+  recognition placeholder.
 
-## Getting Started
+## Prerequisites
 
-1. Install dependencies (ideally in a virtual environment):
+- [Node.js 18+](https://nodejs.org/) (the LTS release works great on Windows, macOS, and Linux).
+- npm (installed with Node). Yarn or pnpm will also work if you prefer an alternative package
+  manager.
+
+## Setup & Run
+
+1. Install dependencies:
 
    ```bash
-   pip install -r requirements.txt
+   npm install
    ```
 
-2. Launch the API server:
+2. Start the API server:
 
    ```bash
-   uvicorn cointracker.main:app --reload
+   npm start
    ```
 
-3. Open the interactive docs at http://127.0.0.1:8000/docs to exercise the endpoints.
+   The service listens on [`http://127.0.0.1:8000`](http://127.0.0.1:8000) by default. Pass
+   `PORT=9000` (or any other port) when launching to override.
+
+3. Explore the endpoints with your favorite HTTP client. Useful routes:
+
+   - `GET /health` – quick health probe.
+   - `GET /items` – list your collection.
+   - `POST /items` – create a new entry (name, country, and denomination are required).
+   - `PATCH /items/{id}` – update an item.
+   - `DELETE /items/{id}` – remove an item when it leaves your collection.
+   - `GET /items/{id}/export` – fetch a shareable summary payload.
+   - `POST /recognize` – prototype vision endpoint that returns deterministic sample data.
+
+   Records are stored in `cointracker.db` in the repository root. Delete the file at any time to
+   start fresh.
+
+### Windows quickstart
+
+```powershell
+# From a PowerShell prompt in the repository root
+npm install
+npm start
+```
+
+Use `Ctrl+C` to stop the server.
 
 ## Running Tests
 
 ```bash
-pytest
+npm test
 ```
+
+Vitest spins up the Express app against an in-memory SQLite database so the suite runs quickly
+without touching your real data file.
